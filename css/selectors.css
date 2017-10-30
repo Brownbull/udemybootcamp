@@ -1,0 +1,17 @@
+/*body  {
+  background: orange;
+}*/
+
+li {
+  border: 2px solid red;
+}
+
+/*this is an id*/
+#special{
+  background: green;
+}
+
+/*this is a class*/
+.completed {
+  text-decoration: line-through;
+}
