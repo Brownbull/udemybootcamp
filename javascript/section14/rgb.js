@@ -88,7 +88,7 @@ for (var i = 0; i < squares.length; i++){
 
 // Functions
 function changeColors(color){
-  for(var i = 0; i < squares.length; i++){
+  for(var i = 0; i < numSquares; i++){
     squares[i].style.backgroundColor = color;
   }
 }
