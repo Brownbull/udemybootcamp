@@ -80,7 +80,7 @@ for (var i = 0; i < squares.length; i++){
       h1.style.backgroundColor = pickedColor;
     } else {
       // this.style.backgroundColor = document.body.style.backgroundColor;
-      this.style.backgroundColor = "steelblue";
+      this.style.backgroundColor = "#232323";
       messageDisplay.textContent = "Try Again";
     }
   });
