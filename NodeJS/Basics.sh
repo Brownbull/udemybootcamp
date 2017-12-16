@@ -4,6 +4,7 @@ $ cd "path/to/app/deirectory"
 $ npm init
 # setup app
 $ npm install "app name"
+$ npm install express --save
 
 # How to use require()
 var cat = require("cat-me");
