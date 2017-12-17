@@ -10,7 +10,20 @@ app.use(express.static("public"));
 // GET - start
 // "/" Hi there
 app.get("/", function(req, res){
-  res.render("home.ejs");
+  res.render("search.ejs");
+});
+
+// "/" Results for movie API
+app.get("/results", function(req, res){
+  var query = req.query.search;
+  var url = "http://www.omdbapi.com/?apikey=thewdb&s=" + query;
+  // res.send(url);
+  request(url, function(error, response, body){
+    if(!error && response.statusCode == 200){
+      var data = JSON.parse(body);
+      res.render("results.ejs", {data: data});
+    }
+  });
 });
 
 // default - this must go at the end of all other routes
