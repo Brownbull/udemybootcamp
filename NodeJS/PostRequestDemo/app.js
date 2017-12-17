@@ -1,15 +1,22 @@
 var express = require("express");
 var app = express();
+var bodyParser = require("body-parser");
 
 // Setup public directory
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
+
+// Global Vars
+var friends = ["Claudia" , "Marcelo" , "Harry"];
 
 // GET - start
-// "/" Hi there
 app.get("/", function(req, res){
   res.render("home.ejs");
-  // console.log("dog request made");
-  // res.send("Hi there!");
+});
+
+app.get("/friends", function(req, res){
+  // var friends = ["Claudia" , "Marcelo" , "Harry"];
+  res.render("friends.ejs", {friends: friends});
 });
 
 // default - this must go at the end of all other routes
@@ -18,6 +25,15 @@ app.get("*", function(req, res){
   res.send("non routed route reached");
 });
 // GET - end
+
+// POST - start
+app.post("/addfriend", function(req, res){
+  // console.log(req.body);
+  var newfriend = req.body.newfriend;
+  friends.push(newfriend);
+  res.redirect("/friends");
+});
+// POST - end
 
 // LISTEN - start
 // Tell Express to listen for request (Start server)

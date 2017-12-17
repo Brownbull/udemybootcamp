@@ -1,6 +1,8 @@
 var express = require("express");
 var app = express();
 
+var asdarr = [];
+
 // Setup public directory
 app.use(express.static("public"));
 
@@ -8,8 +10,6 @@ app.use(express.static("public"));
 // "/" Hi there
 app.get("/", function(req, res){
   res.render("home.ejs");
-  // console.log("dog request made");
-  // res.send("Hi there!");
 });
 
 // default - this must go at the end of all other routes
@@ -18,6 +18,15 @@ app.get("*", function(req, res){
   res.send("non routed route reached");
 });
 // GET - end
+
+// POST - start
+app.post("/addasd", function(req, res){
+  // console.log(req.body);
+  var asd = req.body.asd;
+  asdarr.push(asd);
+  res.redirect("/asd");
+});
+// POST - end
 
 // LISTEN - start
 // Tell Express to listen for request (Start server)
