@@ -1,11 +1,16 @@
-var express = require("express");
-var app = express();
-var request = require("request");
+var express     = require("express");
+var app         = express();
+var request     = require("request");
+var bodyParser  = require("body-parser");
+var mongoose    = require("mongoose");
 
 var asdarr = [];
 
+// setup DB
+mongoose.connect("mongodb://localhost/database_name");
 // Setup public directory
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
 
 // GET - start
 // "/" Hi there
