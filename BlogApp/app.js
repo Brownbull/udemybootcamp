@@ -1,13 +1,16 @@
-var express     = require("express");
-var app         = express();
-var request     = require("request");
-var bodyParser  = require("body-parser");
-var mongoose    = require("mongoose");
+var express         = require("express");
+var app             = express();
+var request         = require("request");
+var bodyParser      = require("body-parser");
+var mongoose        = require("mongoose");
+var methodOverride  = require("method-override");
 
-// DB setup
+// App config
 mongoose.connect("mongodb://localhost/blogapp");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method')); // able to use ?_method=put on update form
+
 // Schema setup
 var blogSchema = new mongoose.Schema({
   title: String,
@@ -70,30 +73,31 @@ app.get("/blogs/:id", function(req, res){
   });
 });
 // Edit    /dogs/:id/edit  GET
+app.get("/blogs/:id/edit", function(req, res){
+  blog.findById(req.params.id, function(err, foundBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      // redirect
+      res.render("edit.ejs", {blog: foundBlog});
+    }
+  });
+
+});
 // Update  /dogs/:id       PUT
+app.put("/blogs/:id", function(req, res){
+  blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.redirect("/blogs/" + req.params.id);
+    }
+  });
+});
 // Destroy /dogs/:id       DELETE
 
-// GET - start
-// "/" Hi there
-// app.get("/", function(req, res){
-//   res.render("home.ejs");
-// });
-//
-// // default - this must go at the end of all other routes
-// app.get("*", function(req, res){
-//   console.log("non routed route reached!");
-//   res.send("non routed route reached");
-// });
-// // GET - end
-//
-// // POST - start
-// app.post("/addasd", function(req, res){
-//   // console.log(req.body);
-//   var asd = req.body.asd;
-//   asdarr.push(asd);
-//   res.redirect("/asd");
-// });
-// POST - end
 
 // LISTEN - start
 // Tell Express to listen for request (Start server)
