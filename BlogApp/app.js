@@ -37,12 +37,26 @@ app.get("/blogs", function(req, res){
     if(err){
       console.log(err);
     } else {
-      res.render("index.ejs", {blogs: blogs});
+      res.render("index.ejs", {blogs: blogs });
     }
   });
 });
 // New     /dogs/new       GET
+app.get("/blogs/new", function(err, res){
+  res.render("new.ejs");
+});
 // Create  /dogs           POST
+app.post("/blogs", function(req, res){
+  // create blog
+  blog.create(req.body.blog, function(err, newBlog){
+    if(err){
+      console.log(err);
+    } else {
+      // redirect
+      res.redirect("/blogs");
+    }
+  });
+});
 // Show    /dogs/:id       GET
 // Edit    /dogs/:id/edit  GET
 // Update  /dogs/:id       PUT
