@@ -4,12 +4,14 @@ var request         = require("request");
 var bodyParser      = require("body-parser");
 var mongoose        = require("mongoose");
 var methodOverride  = require("method-override");
+var expressSanitizer= require("express-sanitizer");
 
 // App config
 mongoose.connect("mongodb://localhost/blogapp");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method')); // able to use ?_method=put on update form
+app.use(expressSanitizer());
 
 // Schema setup
 var blogSchema = new mongoose.Schema({
@@ -51,6 +53,8 @@ app.get("/blogs/new", function(err, res){
 // Create  /dogs           POST
 app.post("/blogs", function(req, res){
   // create blog
+  // sanitize input to delete script or malicius code
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   blog.create(req.body.blog, function(err, newBlog){
     if(err){
       console.log(err);
@@ -87,6 +91,8 @@ app.get("/blogs/:id/edit", function(req, res){
 });
 // Update  /dogs/:id       PUT
 app.put("/blogs/:id", function(req, res){
+  // sanitize input to delete script or malicius code
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
     if(err){
       console.log(err);
