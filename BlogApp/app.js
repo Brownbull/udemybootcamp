@@ -97,6 +97,17 @@ app.put("/blogs/:id", function(req, res){
   });
 });
 // Destroy /dogs/:id       DELETE
+app.delete("/blogs/:id", function(req, res){
+  // destroy blog
+  blog.findByIdAndRemove(req.params.id, function(err){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.redirect("/blogs");
+    }
+  })
+});
 
 
 // LISTEN - start
