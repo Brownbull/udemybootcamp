@@ -58,6 +58,17 @@ app.post("/blogs", function(req, res){
   });
 });
 // Show    /dogs/:id       GET
+app.get("/blogs/:id", function(req, res){
+  blog.findById(req.params.id, function(err, foundBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      // redirect
+      res.render("show.ejs", {blog: foundBlog});
+    }
+  });
+});
 // Edit    /dogs/:id/edit  GET
 // Update  /dogs/:id       PUT
 // Destroy /dogs/:id       DELETE
