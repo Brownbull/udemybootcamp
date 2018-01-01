@@ -3,37 +3,14 @@ var app         = express();
 var request     = require("request");
 var bodyParser  = require("body-parser");
 var mongoose    = require("mongoose");
+var seedDB      = require("./seeds");
 
 // DB setup
 mongoose.connect("mongodb://localhost/yelp_camp");
+seedDB();
 
-// Schema setup
-var campgroundSchema = new mongoose.Schema({
-  name: String,
-  image: String,
-  description: String
-});
-
-var camp = mongoose.model("Campground", campgroundSchema);
-
-// add a camp
-// camp.create({
-//   name: "Loni Logic",
-//   image: "https://farm6.staticflickr.com/5181/5641024448_04fefbb64d.jpg"
-// }, function(err, camp){
-//   if (err) {
-//     console.log(err);
-//   } else {
-//     console.log("new campground created");
-//     console.log(camp);
-//   }
-// });
-
-// var campgrounds = [
-//   // {name: "Salmon Creek", image: "https://farm1.staticflickr.com/130/321487195_ff34bde2f5.jpg"},
-//   // {name: "Loni Logic", image: "https://farm6.staticflickr.com/5181/5641024448_04fefbb64d.jpg"},
-//   // {name: "In the Middle", image: "https://farm5.staticflickr.com/4137/4812576807_8ba9255f38.jpg"}
-// ];
+//Models
+var camp = require("./models/campground");
 
 // Setup public directory
 app.use(express.static("public"));
@@ -65,16 +42,15 @@ app.get("/campgrounds/new", function(req, res){
 // SHOW
 app.get("/campgrounds/:id", function(req, res){
   // find camp with id
-  camp.findById(req.params.id, function(err, foundCampground){
+  camp.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
     if (err) {
       console.log(err);
     } else {
+      // console.log(foundCampground);
       res.render("show.ejs", {campground: foundCampground});
-    }
-  });
-  // render template with that id
-  // res.render("show.ejs");
-});
+    } //eof if/else of camp.findById
+  }) // eof camp.findById
+}); // eof app.get
 
 // default - this must go at the end of all other routes
 // app.get("*", function(req, res){
