@@ -4,14 +4,13 @@ var request     = require("request");
 var bodyParser  = require("body-parser");
 var mongoose    = require("mongoose");
 var seedDB      = require("./seeds");
+//Models
+var camp        = require("./models/campground");
+var comment     = require("./models/comment");
 
 // DB setup
-mongoose.connect("mongodb://localhost/yelp_camp");
+mongoose.connect("mongodb://localhost/yelp_camp2");
 seedDB();
-
-//Models
-var camp = require("./models/campground");
-var comment = require("./models/comment");
 
 // Setup public directory
 app.use(express.static("public"));
@@ -76,11 +75,11 @@ app.post("/campgrounds", function(req, res){
 // ===========================
 // New     /dogs/new          GET
 app.get("/campgrounds/:id/comments/new", function(req, res){
-  camp.findById(req.params.id, function(err, campground){
+  camp.findById(req.params.id, function(err, campData){
     if (err) {
       console.log(err);
     } else {
-      res.render("comments/new.ejs", {campground: campground});
+      res.render("comments/new.ejs", {campground: campData});
     } // eof if/else of camp.findById
   }) // eof camp.findById
 }); //eof app.get
@@ -92,7 +91,6 @@ app.post("/campgrounds/:id/comments", function(req, res){
       console.log(err);
       res.redirect("/campgrounds");
     } else {
-      console.log(req.body.comment);
       comment.create(req.body.comment, function(err, comment){
         if (err) {
           console.log(err);
@@ -101,9 +99,9 @@ app.post("/campgrounds/:id/comments", function(req, res){
           campData.save();
           res.redirect('/campgrounds/' + campData._id)
         } // eof if/else of comment.create
-      }) // eof comment.create
+      }); // eof comment.create
     } // eof if/else of camp.findById
-  }) // eof camp.findById
+  }); // eof camp.findById
 }); //eof app.post
 
 // LISTEN - start
