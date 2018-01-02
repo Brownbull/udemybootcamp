@@ -11,12 +11,13 @@ seedDB();
 
 //Models
 var camp = require("./models/campground");
+var comment = require("./models/comment");
 
 // Setup public directory
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
-// GET - start
+// INDEX
 app.get("/", function(req, res){
   res.render("landing.ejs");
 });
@@ -28,7 +29,7 @@ app.get("/campgrounds", function(req, res){
     if (err) {
       console.log(err);
     } else {
-      res.render("index.ejs", {campgrounds: camps});
+      res.render("campgrounds/index.ejs", {campgrounds: camps});
     }
   });
   // res.render("campgrounds.ejs", {campgrounds: campgrounds});
@@ -36,7 +37,7 @@ app.get("/campgrounds", function(req, res){
 
 // NEW
 app.get("/campgrounds/new", function(req, res){
-  res.render("new.ejs");
+  res.render("campgrounds/new.ejs");
 });
 
 // SHOW
@@ -47,19 +48,11 @@ app.get("/campgrounds/:id", function(req, res){
       console.log(err);
     } else {
       // console.log(foundCampground);
-      res.render("show.ejs", {campground: foundCampground});
+      res.render("campgrounds/show.ejs", {campground: foundCampground});
     } //eof if/else of camp.findById
   }) // eof camp.findById
 }); // eof app.get
 
-// default - this must go at the end of all other routes
-// app.get("*", function(req, res){
-//   console.log("non routed route reached!");
-//   res.send("non routed route reached");
-// });
-// GET - end
-
-// POST - start
 // CREATE
 app.post("/campgrounds", function(req, res){
   // res.send("post req");
@@ -76,9 +69,42 @@ app.post("/campgrounds", function(req, res){
       res.redirect("/campgrounds");
     }
   });
-  // res.redirect("/campgrounds");
 });
-// POST - end
+
+// ===========================
+// COMMENTS ROUTES
+// ===========================
+// New     /dogs/new          GET
+app.get("/campgrounds/:id/comments/new", function(req, res){
+  camp.findById(req.params.id, function(err, campground){
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("comments/new.ejs", {campground: campground});
+    } // eof if/else of camp.findById
+  }) // eof camp.findById
+}); //eof app.get
+
+// Create  /dogs     ->Rdrct  POST    Dog.create()
+app.post("/campgrounds/:id/comments", function(req, res){
+  camp.findById(req.params.id, function(err, campData){
+    if (err) {
+      console.log(err);
+      res.redirect("/campgrounds");
+    } else {
+      console.log(req.body.comment);
+      comment.create(req.body.comment, function(err, comment){
+        if (err) {
+          console.log(err);
+        } else {
+          campData.comments.push(comment);
+          campData.save();
+          res.redirect('/campgrounds/' + campData._id)
+        } // eof if/else of comment.create
+      }) // eof comment.create
+    } // eof if/else of camp.findById
+  }) // eof camp.findById
+}); //eof app.post
 
 // LISTEN - start
 app.listen(3000, 'localhost', function(req, res) {

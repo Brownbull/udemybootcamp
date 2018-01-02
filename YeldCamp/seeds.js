@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 // Models
 var camp = require("./models/campground");
-var comment = require("./models/comments");
+var comment = require("./models/comment");
 
 // Base data
 var data = [
@@ -26,39 +26,45 @@ var data = [
 
 // Seed functionality
 function seedDB(){
-  // remove all campground
-  camp.remove({}, function(err) {
+  // remove all comments
+  comment.remove({}, function(err) {
     if (err) {
       console.log(err);
     } else {
-      console.log("ALL campgrounds removed.");
-      // add campgorunds
-      data.forEach(function(campground){
-        camp.create(campground, function(err, campData){
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("campground added");
-            // create a comment
-            comment.create(
-            {
-              text: "This is a really nice place",
-              author: "Gabe"
-            },
-            function(err, comment){
+      // remove all campground
+      camp.remove({}, function(err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("ALL campgrounds removed.");
+          // add campgorunds
+          data.forEach(function(campground){
+            camp.create(campground, function(err, campData){
               if (err) {
                 console.log(err);
               } else {
-                campData.comments.push(comment);
-                campData.save();
-                console.log("comments created");
-              } // eof if/else on comment.create
-            }) // eof comment.create
-          } // eof if/else on camp.create
-        }) // eof camp.create
-      }) // eof data.forEach
-    } // eof if/else on camp.remove
-  }) // eof camp.remove
-}; // eof function seedDB
-
+                console.log("campground added");
+                // create a comment
+                comment.create(
+                {
+                  text: "This is a really nice place",
+                  author: "Gabe"
+                },
+                function(err, comment){
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    campData.comments.push(comment);
+                    campData.save();
+                    console.log("comments created");
+                  } // eof if/else on comment.create
+                }) // eof comment.create
+              } // eof if/else on camp.create
+            }) // eof camp.create
+          }) // eof data.forEach
+        } // eof if/else on camp.remove
+      }) // eof camp.remove
+    }; // eof function seedDB
+  }) // eof comment.remove
+}; //eof seedDB
 module.exports = seedDB;
