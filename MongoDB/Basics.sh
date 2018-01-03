@@ -1,6 +1,9 @@
 # init mongo from console
 mongod --dbpath D:\data\db
 
+# npm install
+npm install mongoose@4.13.8 --save
+
 # Once initialized you can accesswith mongo comand
 mongo
 # see databases
