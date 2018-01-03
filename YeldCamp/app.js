@@ -4,19 +4,19 @@ var app                   = express();
 var request               = require("request");
 var bodyParser            = require("body-parser");
 var mongoose              = require("mongoose");
-var seedDB                = require("./seeds");
 var passport              = require("passport");
 var bodyParser            = require("body-parser");
 var localStrategy         = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 
 // MODELS
-var Camp        = require("./models/campground");
-var Comment     = require("./models/comment");
-var User        = require('./models/user');
+var Camp                  = require("./models/campground");
+var Comment               = require("./models/comment");
+var User                  = require('./models/user');
+var seedDB                = require("./seeds");
 
 // SETUP
-mongoose.connect("mongodb://localhost/yelp_camp2");
+mongoose.connect("mongodb://localhost/yelp_camp");
 seedDB();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -31,6 +31,12 @@ passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser()); // code session info
 passport.deserializeUser(User.deserializeUser()); // decode session info
 
+// USER CACHE ON ALL ROUTES
+app.use(function(req, res, next){
+  res.locals.currentUser = req.user;
+  next();
+});
+
 //=============
 // ROUTES
 //=============
@@ -41,16 +47,14 @@ app.get("/", function(req, res){
 
 // INDEX
 app.get("/campgrounds", function(req, res){
-  // Get all campgrounds from DB
   Camp.find({}, function(err, camps){
     if (err) {
       console.log(err);
     } else {
       res.render("campgrounds/index.ejs", {campgrounds: camps});
-    }
-  });
-  // res.render("campgrounds.ejs", {campgrounds: campgrounds});
-});
+    } // oef if/else of Camp.find
+  }); //eof Camp.find
+}); // eof apt.get
 
 // NEW
 app.get("/campgrounds/new", function(req, res){
@@ -92,7 +96,7 @@ app.post("/campgrounds", function(req, res){
 // COMMENTS ROUTES
 // ===========================
 // New     /dogs/new          GET
-app.get("/campgrounds/:id/comments/new", function(req, res){
+app.get("/campgrounds/:id/comments/new", isLoggedIn, function(req, res){
   Camp.findById(req.params.id, function(err, campData){
     if (err) {
       console.log(err);
@@ -103,7 +107,7 @@ app.get("/campgrounds/:id/comments/new", function(req, res){
 }); //eof app.get
 
 // Create  /dogs     ->Rdrct  POST    Dog.create()
-app.post("/campgrounds/:id/comments", function(req, res){
+app.post("/campgrounds/:id/comments", isLoggedIn, function(req, res){
   Camp.findById(req.params.id, function(err, campData){
     if (err) {
       console.log(err);
@@ -121,6 +125,57 @@ app.post("/campgrounds/:id/comments", function(req, res){
     } // eof if/else of Camp.findById
   }); // eof Camp.findById
 }); //eof app.post
+
+// ===========================
+// AUTH ROUTES
+// ===========================
+// SHOW SIGN UP FORM
+app.get("/register", function(req, res){
+  res.render("register.ejs")
+});
+
+// HANDLING USER SIGN UP
+app.post("/register", function(req, res){
+  var newUser = new User({username: req.body.username})
+  User.register(newUser, req.body.password, function(err, user){
+    if (err) {
+      console.log(err);
+      res.render("register.ejs")
+    }
+    passport.authenticate("local")(req, res, function(){
+      res.redirect("/campgrounds")
+    }); // eof passport.authenticate
+  }); // eof User.register
+}); // eof app.post
+
+// SHOW LOGIN FORM
+app.get("/login", function(req, res){
+  res.render("login.ejs");
+});
+// LOGIN LOGIC
+app.post("/login",
+  passport.authenticate("local", {
+    successRedirect: "/campgrounds",
+    failureRedirect: "/login"
+  }),
+  function(req, res){
+});
+
+// LOGOUT
+app.get("/logout", function(req, res){
+  req.logout();
+  res.redirect('/campgrounds');
+});
+
+// ===========================
+// MIDDLEWARE
+// ===========================
+function isLoggedIn(req, res, next){
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+};
 
 // LISTEN - start
 app.listen(3000, 'localhost', function(req, res) {
