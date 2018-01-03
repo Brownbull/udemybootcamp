@@ -7,6 +7,8 @@ var mongoose              = require("mongoose");
 var passport              = require("passport");
 var bodyParser            = require("body-parser");
 var localStrategy         = require("passport-local");
+var methodOverride        = require("method-override");
+var expressSanitizer      = require("express-sanitizer");
 var passportLocalMongoose = require("passport-local-mongoose");
 
 // MODELS
@@ -25,6 +27,8 @@ mongoose.connect("mongodb://localhost/yelp_camp");
 // seedDB();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method')); // able to use ?_method=put on update form
+app.use(expressSanitizer());
 app.use(require("express-session")({
   secret: "Tommy is the mas pulentio",
   resave: false,

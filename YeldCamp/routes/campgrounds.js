@@ -21,19 +21,6 @@ router.get("/new", isLoggedIn, function(req, res){
   res.render("campgrounds/new.ejs");
 });
 
-// SHOW
-router.get("/:id", function(req, res){
-  // find camp with id
-  Camp.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
-    if (err) {
-      console.log(err);
-    } else {
-      // console.log(foundCampground);
-      res.render("campgrounds/show.ejs", {campground: foundCampground});
-    } //eof if/else of Camp.findById
-  }) // eof Camp.findById
-}); // eof router.get
-
 // CREATE
 router.post("/", isLoggedIn, function(req, res){
   // res.send("post req");
@@ -51,6 +38,45 @@ router.post("/", isLoggedIn, function(req, res){
       console.log(err);
     } else {
       res.redirect("/campgrounds");
+    }
+  });
+});
+
+// SHOW
+router.get("/:id", function(req, res){
+  // find camp with id
+  Camp.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
+    if (err) {
+      console.log(err);
+    } else {
+      // console.log(foundCampground);
+      res.render("campgrounds/show.ejs", {campground: foundCampground});
+    } //eof if/else of Camp.findById
+  }) // eof Camp.findById
+}); // eof router.get
+
+// EDIT
+router.get("/:id/edit", function(req, res){
+  Camp.findById(req.params.id, function(err, foundCamp){
+    if(err){
+      console.log(err);
+      res.redirect("/campgrounds");
+    } else {
+      res.render("campgrounds/edit.ejs", {campground: foundCamp});
+    }
+  });
+});
+
+// UPDATE
+router.put("/:id", function(req, res){
+  // sanitize input to delete script or malicius code
+  // req.body.campground.description = req.sanitize(req.body.campground.description);
+  Camp.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCamp){
+    if(err){
+      console.log(err);
+      res.redirect("/campgrounds");
+    } else {
+      res.redirect("/campgrounds/" + req.params.id);
     }
   });
 });

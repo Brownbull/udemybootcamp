@@ -87,7 +87,6 @@ app.get("/blogs/:id/edit", function(req, res){
       res.render("edit.ejs", {blog: foundBlog});
     }
   });
-
 });
 // Update  /dogs/:id       PUT
 app.put("/blogs/:id", function(req, res){
