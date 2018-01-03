@@ -17,7 +17,7 @@ router.get("/", function(req, res){
 }); // eof apt.get
 
 // NEW
-router.get("/new", function(req, res){
+router.get("/new", isLoggedIn, function(req, res){
   res.render("campgrounds/new.ejs");
 });
 
@@ -35,13 +35,16 @@ router.get("/:id", function(req, res){
 }); // eof router.get
 
 // CREATE
-router.post("/", function(req, res){
+router.post("/", isLoggedIn, function(req, res){
   // res.send("post req");
   var name = req.body.name;
   var image = req.body.image;
   var description = req.body.description;
-  var newCampground = {name: name, image: image, description: description};
-  // campgrounds.push(newCampground);
+  var author = {
+    id: req.user._id,
+    username: req.user.username
+  }
+  var newCampground = {name: name, image: image, description: description, author: author};
   // Crate new camp on DB
   Camp.create(newCampground, function(err, newcamp){
     if (err) {
@@ -51,5 +54,16 @@ router.post("/", function(req, res){
     }
   });
 });
+
+// ===========================
+// MIDDLEWARE
+// ===========================
+function isLoggedIn(req, res, next){
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+};
+
 
 module.exports = router;
