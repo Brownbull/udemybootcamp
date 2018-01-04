@@ -56,19 +56,14 @@ router.get("/:id", function(req, res){
 }); // eof router.get
 
 // EDIT
-router.get("/:id/edit", function(req, res){
+router.get("/:id/edit", checkCampgroundOwnership, function(req, res){
   Camp.findById(req.params.id, function(err, foundCamp){
-    if(err){
-      console.log(err);
-      res.redirect("/campgrounds");
-    } else {
-      res.render("campgrounds/edit.ejs", {campground: foundCamp});
-    }
-  });
-});
+    res.render("campgrounds/edit.ejs", {campground: foundCamp});
+  }); // eof Camp.findById
+}); // eof router.get
 
 // UPDATE
-router.put("/:id", function(req, res){
+router.put("/:id", checkCampgroundOwnership, function(req, res){
   // sanitize input to delete script or malicius code
   // req.body.campground.description = req.sanitize(req.body.campground.description);
   Camp.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCamp){
@@ -82,7 +77,7 @@ router.put("/:id", function(req, res){
 });
 
 // DESTROY
-router.delete("/:id", function(req, res){
+router.delete("/:id", checkCampgroundOwnership, function(req, res){
   Camp.findByIdAndRemove(req.params.id, function(err){
     if(err){
       console.log(err);
@@ -101,7 +96,27 @@ function isLoggedIn(req, res, next){
     return next();
   }
   res.redirect('/login');
-};
+} // eof isLoggedIn
+
+function checkCampgroundOwnership(req, res, next){
+  if (req.isAuthenticated()) {
+    Camp.findById(req.params.id, function(err, foundCamp){
+      if(err){
+        res.redirect("back");
+      } else {
+        if (foundCamp.author.id.equals(req.user._id)){
+          next();
+        }
+        else {
+          res.redirect("back");
+        } // eof if/else id compare
+      } // eof if/else of Camp.findById
+    }) // eof Camp.findById
+  } else {
+    res.redirect("back");
+  } // eof if/else of router.get
+} // eof checkCampgroundOwnership
+
 
 
 module.exports = router;
