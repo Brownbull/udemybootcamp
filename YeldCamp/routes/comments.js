@@ -42,6 +42,42 @@ router.post("/", isLoggedIn, function(req, res){
   }); // eof Camp.findById
 }); //eof app.post
 
+// EDIT
+router.get("/:comment_id/edit", function(req, res){
+  Comment.findById(req.params.comment_id, function(err, foundComment){
+    if (err) {
+      res.redirect("back");
+    } else {
+      res.render("comments/edit.ejs", {campground_id: req.params.id, comment: foundComment});
+    }    
+  }); // eof Comment.findById
+}); // eof router.get
+
+// UPDATE
+router.put("/:comment_id", function(req, res){
+  // sanitize input to delete script or malicius code
+  // req.body.campground.description = req.sanitize(req.body.campground.description);
+  Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
+    if(err){
+      res.redirect("back");
+    } else {
+      res.redirect("/campgrounds/" + req.params.id);
+    }
+  });
+});
+
+// DESTROY
+router.delete("/:id", function(req, res){
+  Camp.findByIdAndRemove(req.params.id, function(err){
+    if(err){
+      console.log(err);
+      res.redirect("/campgrounds");
+    } else {
+      res.redirect("/campgrounds");
+    }
+  })
+});
+
 // ===========================
 // MIDDLEWARE
 // ===========================
