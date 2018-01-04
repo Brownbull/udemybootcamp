@@ -1,6 +1,5 @@
 // LIBS
 var express               = require("express");
-var app                   = express();
 var request               = require("request");
 var bodyParser            = require("body-parser");
 var mongoose              = require("mongoose");
@@ -25,6 +24,7 @@ var campgroundRoutes      = require("./routes/campgrounds");
 // SETUP
 mongoose.connect("mongodb://localhost/yelp_camp");
 // seedDB();
+var app = express();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method')); // able to use ?_method=put on update form
