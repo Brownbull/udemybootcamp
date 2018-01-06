@@ -67,13 +67,12 @@ router.put("/:comment_id", function(req, res){
 });
 
 // DESTROY
-router.delete("/:id", function(req, res){
-  Camp.findByIdAndRemove(req.params.id, function(err){
+router.delete("/:comment_id", function(req, res){
+  Comment.findByIdAndRemove(req.params.comment_id, function(err){
     if(err){
-      console.log(err);
-      res.redirect("/campgrounds");
+      res.redirect("back");
     } else {
-      res.redirect("/campgrounds");
+      res.redirect("/campgrounds/" + req.params.id);
     }
   })
 });
