@@ -30,3 +30,18 @@
         </div>
       </div>
     </nav>
+
+    <% if (success.length > 0 || info.length > 0 || warning.length > 0 ||danger.length > 0) { %>
+    <div class="container">
+      <% if (success.length > 0) { %>
+      <div class="alert alert-success" role="alert"> <%= success %> </div>
+      <% } if (info.length > 0) { %>
+      <div class="alert alert-info" role="alert"> <%= info %> </div>
+      <% } if (warning.length > 0) { %>
+      <div class="alert alert-warning" role="alert"> <%= warning %> </div>
+      <% } if (danger.length > 0) { %>
+      <div class="alert alert-danger" role="alert"> <%= danger %> </div>
+      <% } %>
+    </div>
+    <% } %>
+    

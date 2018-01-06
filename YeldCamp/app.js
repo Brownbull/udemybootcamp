@@ -1,4 +1,5 @@
 // LIBS
+var flash                 = require("connect-flash");
 var express               = require("express");
 var request               = require("request");
 var bodyParser            = require("body-parser");
@@ -23,7 +24,7 @@ var campgroundRoutes      = require("./routes/campgrounds");
 
 // SETUP
 mongoose.connect("mongodb://localhost/yelp_camp");
-// seedDB();
+// seedDB(); 
 var app = express();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -33,7 +34,8 @@ app.use(require("express-session")({
   secret: "Tommy is the mas pulentio",
   resave: false,
   saveUninitialized: false
-}))
+}));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
@@ -42,7 +44,11 @@ passport.deserializeUser(User.deserializeUser()); // decode session info
 
 // USER CACHE ON ALL ROUTES
 app.use(function(req, res, next){
-  res.locals.currentUser = req.user;
+  res.locals.currentUser  = req.user;
+  res.locals.success      = req.flash("success");
+  res.locals.info         = req.flash("info");
+  res.locals.warning      = req.flash("warning");
+  res.locals.danger       = req.flash("danger");
   next();
 });
 
