@@ -1,6 +1,7 @@
 var express = require("express");
 var router  = express.Router();
 var Camp = require("../models/campground");
+var middleware = require("../middleware"); // same as middleware/index.js
 
 //=============
 // CAMPGROUND ROUTES
@@ -17,12 +18,12 @@ router.get("/", function(req, res){
 }); // eof apt.get
 
 // NEW
-router.get("/new", isLoggedIn, function(req, res){
+router.get("/new", middleware.isLoggedIn, function(req, res){
   res.render("campgrounds/new.ejs");
 });
 
 // CREATE
-router.post("/", isLoggedIn, function(req, res){
+router.post("/", middleware.isLoggedIn, function(req, res){
   // res.send("post req");
   var name = req.body.name;
   var image = req.body.image;
@@ -56,14 +57,14 @@ router.get("/:id", function(req, res){
 }); // eof router.get
 
 // EDIT
-router.get("/:id/edit", checkCampgroundOwnership, function(req, res){
+router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
   Camp.findById(req.params.id, function(err, foundCamp){
     res.render("campgrounds/edit.ejs", {campground: foundCamp});
   }); // eof Camp.findById
 }); // eof router.get
 
 // UPDATE
-router.put("/:id", checkCampgroundOwnership, function(req, res){
+router.put("/:id", middleware.checkCampgroundOwnership, function(req, res){
   // sanitize input to delete script or malicius code
   // req.body.campground.description = req.sanitize(req.body.campground.description);
   Camp.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCamp){
@@ -77,7 +78,7 @@ router.put("/:id", checkCampgroundOwnership, function(req, res){
 });
 
 // DESTROY
-router.delete("/:id", checkCampgroundOwnership, function(req, res){
+router.delete("/:id", middleware.checkCampgroundOwnership, function(req, res){
   Camp.findByIdAndRemove(req.params.id, function(err){
     if(err){
       console.log(err);
@@ -87,36 +88,5 @@ router.delete("/:id", checkCampgroundOwnership, function(req, res){
     }
   })
 });
-
-// ===========================
-// MIDDLEWARE
-// ===========================
-function isLoggedIn(req, res, next){
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/login');
-} // eof isLoggedIn
-
-function checkCampgroundOwnership(req, res, next){
-  if (req.isAuthenticated()) {
-    Camp.findById(req.params.id, function(err, foundCamp){
-      if(err){
-        res.redirect("back");
-      } else {
-        if (foundCamp.author.id.equals(req.user._id)){
-          next();
-        }
-        else {
-          res.redirect("back");
-        } // eof if/else id compare
-      } // eof if/else of Camp.findById
-    }) // eof Camp.findById
-  } else {
-    res.redirect("back");
-  } // eof if/else of router.get
-} // eof checkCampgroundOwnership
-
-
 
 module.exports = router;
