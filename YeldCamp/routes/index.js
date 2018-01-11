@@ -54,11 +54,6 @@ router.get("/logout", function(req, res){
   res.redirect('/campgrounds');
 });
 
-// DEFAULT
-router.get("/*", function (req, res) {
-  res.render("landing.ejs");
-});
-
 // ===========================
 // MIDDLEWARE
 // ===========================
