@@ -2,7 +2,6 @@
 var flash                 = require("connect-flash");
 var express               = require("express");
 var request               = require("request");
-var bodyParser            = require("body-parser");
 var mongoose              = require("mongoose");
 var passport              = require("passport");
 var bodyParser            = require("body-parser");
@@ -31,7 +30,7 @@ if (!process.env.DATABASEURL){
 }
 
 // SETUP
-mongoose.connect(process.env.DATABASEURL); // remote conection
+mongoose.connect(process.env.DATABASEURL);
 // seedDB(); 
 var app = express();
 app.use(express.static(__dirname + "/public"));
